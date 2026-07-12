@@ -21,3 +21,12 @@ desktop.ini
 # Journaux locaux sensibles (futurs)
 *.local.log
 logs/
+
+# Dépendances Node
+node_modules/
+
+# Sorties de build
+/out/
+/dist/
+/dist-electron/
+*.tsbuildinfo

@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.status {
+  font-weight: 600;
+  color: #2f7d31;
+}
+
+.phase {
+  color: #6b6b6b;
+}
+
+section h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+ul {
+  padding-left: 1.25rem;
+}
