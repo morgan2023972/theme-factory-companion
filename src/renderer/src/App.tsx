@@ -1,13 +1,15 @@
-import { APP_NAME } from '../../shared/appInfo'
-
 const FUTURE_MODULES = ['Projets', 'Phases', 'Tâches', 'Problèmes', 'Décisions'] as const
 
 function App(): React.JSX.Element {
+  const appInfo = window.themeFactoryApi.app.getInfo()
+
   return (
     <main className="app">
-      <h1>{APP_NAME}</h1>
-      <p className="status">Le socle Electron est opérationnel.</p>
-      <p className="phase">Phase 1 en cours — ce socle ne contient aucune fonctionnalité métier.</p>
+      <h1>{appInfo.name}</h1>
+      <p className="status">Le pont preload sécurisé est opérationnel.</p>
+      <p className="phase">
+        {appInfo.phase} — environnement : {appInfo.environment}
+      </p>
 
       <section>
         <h2>Modules à venir</h2>

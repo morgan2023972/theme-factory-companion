@@ -46,6 +46,15 @@ SQLite
 
 Ce schéma illustre le sens de circulation de l'information : le renderer ne dialogue jamais directement avec SQLite ni avec le système, mais uniquement à travers l'API contrôlée exposée par le preload, elle-même relayée par des canaux IPC explicitement autorisés vers le processus principal.
 
+## Socle Electron implémenté (Phase 1)
+
+Contrairement au reste de ce document, la séparation `main` / `preload` / `renderer` / `shared` ci-dessous est **déjà implémentée** à ce stade (socle uniquement, sans SQLite ni fonctionnalité métier) :
+
+- **`main`** — cycle de vie de l'application et création de la fenêtre principale (`sandbox`, `contextIsolation`, politique de navigation et de nouvelles fenêtres refusées par défaut).
+- **`preload`** — expose un unique objet `window.themeFactoryApi`, conforme au contrat partagé, via `contextBridge.exposeInMainWorld`. `ipcRenderer` n'est **jamais** exposé directement au renderer, et aucun canal IPC générique n'existe à ce stade.
+- **`renderer`** — React ; ne consomme que l'API exposée sur `window.themeFactoryApi`, sans aucun import direct d'Electron ou de Node.
+- **`shared`** — contrats TypeScript et constantes (dossier `shared/contracts`), sans dépendance à Electron, Node ou React, réutilisés à la fois par le preload et le renderer pour éviter toute duplication de types.
+
 ## Statut
 
 Cette architecture est une **proposition de cadrage**, destinée à guider les décisions techniques des phases ultérieures de la [roadmap](ROADMAP.md). Elle pourra être ajustée et précisée au fil des décisions consignées dans [docs/decisions/](decisions/).
