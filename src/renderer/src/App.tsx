@@ -1,25 +1,31 @@
-const FUTURE_MODULES = ['Projets', 'Phases', 'Tâches', 'Problèmes', 'Décisions'] as const
+import { useState } from 'react'
+import { AppSidebar } from './components/AppSidebar'
+import { PageHeader } from './components/PageHeader'
+import { PlaceholderPage } from './pages/PlaceholderPage'
+import { DashboardStatus } from './pages/DashboardStatus'
+import { DEFAULT_NAVIGATION_ID, NAVIGATION_DESTINATIONS } from './navigation'
+import type { NavigationId } from './navigation'
 
 function App(): React.JSX.Element {
-  const appInfo = window.themeFactoryApi.app.getInfo()
+  const [activeId, setActiveId] = useState<NavigationId>(DEFAULT_NAVIGATION_ID)
+  const activeDestination = NAVIGATION_DESTINATIONS.find((destination) => destination.id === activeId)
+
+  if (!activeDestination) {
+    throw new Error(`Destination de navigation inconnue : ${activeId}`)
+  }
 
   return (
-    <main className="app">
-      <h1>{appInfo.name}</h1>
-      <p className="status">Le pont preload sécurisé est opérationnel.</p>
-      <p className="phase">
-        {appInfo.phase} — environnement : {appInfo.environment}
-      </p>
-
-      <section>
-        <h2>Modules à venir</h2>
-        <ul>
-          {FUTURE_MODULES.map((module) => (
-            <li key={module}>{module}</li>
-          ))}
-        </ul>
-      </section>
-    </main>
+    <div className="app-shell">
+      <AppSidebar destinations={NAVIGATION_DESTINATIONS} activeId={activeId} onSelect={setActiveId} />
+      <div className="app-shell__content">
+        <PageHeader title={activeDestination.label} />
+        <main className="app-shell__main">
+          <PlaceholderPage description={activeDestination.description} plannedNote={activeDestination.plannedNote}>
+            {activeDestination.id === 'dashboard' ? <DashboardStatus /> : null}
+          </PlaceholderPage>
+        </main>
+      </div>
+    </div>
   )
 }
 
