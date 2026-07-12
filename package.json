@@ -8,20 +8,28 @@
   },
   "scripts": {
     "dev": "electron-vite dev",
+    "predev": "npm run rebuild:native",
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
     "test": "vitest run",
+    "pretest": "npm run rebuild:node",
     "test:watch": "vitest",
-    "build": "electron-vite build"
+    "build": "electron-vite build",
+    "postinstall": "npm run rebuild:native",
+    "rebuild:native": "electron-rebuild -f -w better-sqlite3",
+    "rebuild:node": "npm rebuild better-sqlite3"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "better-sqlite3": "^12.11.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
     "@swc/core": "^1.15.43",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
