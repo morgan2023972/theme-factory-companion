@@ -1,0 +1,23 @@
+# Fichiers temporaires système
+*.tmp
+*.temp
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fichiers d'éditeurs
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+
+# Variables d'environnement (futures)
+.env
+.env.local
+.env.*.local
+
+# Journaux locaux sensibles (futurs)
+*.local.log
+logs/
