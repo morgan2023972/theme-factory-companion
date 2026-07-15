@@ -1,7 +1,9 @@
 import type { Migration } from './migrationTypes'
+import { createInitialMvpSchemaMigration } from './0001_createInitialMvpSchema'
 
 /**
  * Liste des migrations applicatives, dans l'ordre de leur ajout.
- * Aucune table métier n'est encore définie à ce stade (Phase 2.2).
+ * Une migration déjà validée et commitée est immuable : toute évolution
+ * du schéma doit passer par une nouvelle migration.
  */
-export const migrations: readonly Migration[] = []
+export const migrations: readonly Migration[] = [createInitialMvpSchemaMigration]
