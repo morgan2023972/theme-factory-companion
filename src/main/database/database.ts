@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3'
 import { runMigrations } from './migrations/runMigrations'
+import { checkDatabaseHealth } from './databaseHealth'
 
 export type DatabaseConnection = Database.Database
 
@@ -24,9 +25,16 @@ export function openDatabase(path: string): DatabaseConnection {
   }
 
   const db = new Database(path)
-  configureConnection(db)
-  runHealthCheck(db)
-  runMigrations(db)
+
+  try {
+    configureConnection(db)
+    runHealthCheck(db)
+    runMigrations(db)
+    checkDatabaseHealth(db)
+  } catch (error) {
+    db.close()
+    throw error
+  }
 
   connection = db
   return connection
