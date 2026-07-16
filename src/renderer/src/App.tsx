@@ -3,6 +3,7 @@ import { AppSidebar } from './components/AppSidebar'
 import { PageHeader } from './components/PageHeader'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { DashboardStatus } from './pages/DashboardStatus'
+import { ProjectsPage } from './pages/ProjectsPage'
 import { DEFAULT_NAVIGATION_ID, NAVIGATION_DESTINATIONS } from './navigation'
 import type { NavigationId } from './navigation'
 
@@ -20,9 +21,13 @@ function App(): React.JSX.Element {
       <div className="app-shell__content">
         <PageHeader title={activeDestination.label} />
         <main className="app-shell__main">
-          <PlaceholderPage description={activeDestination.description} plannedNote={activeDestination.plannedNote}>
-            {activeDestination.id === 'dashboard' ? <DashboardStatus /> : null}
-          </PlaceholderPage>
+          {activeDestination.id === 'projects' ? (
+            <ProjectsPage />
+          ) : (
+            <PlaceholderPage description={activeDestination.description} plannedNote={activeDestination.plannedNote}>
+              {activeDestination.id === 'dashboard' ? <DashboardStatus /> : null}
+            </PlaceholderPage>
+          )}
         </main>
       </div>
     </div>

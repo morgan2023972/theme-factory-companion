@@ -17,5 +17,5 @@
     "skipLibCheck": false,
     "noEmit": true
   },
-  "include": ["src/renderer/src/**/*", "src/shared/**/*.ts"]
+  "include": ["src/renderer/src/**/*", "src/shared/**/*.ts", "vitest.setup.ts"]
 }
