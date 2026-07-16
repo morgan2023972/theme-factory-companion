@@ -70,7 +70,14 @@ export type CreateProjectInput = z.input<typeof createProjectSchema>
 /**
  * Schéma de mise à jour partielle : mêmes règles de validation que la
  * création, mais tous les champs sont optionnels et `id`/`createdAt`/
- * `updatedAt` restent exclus. Un objet vide est refusé.
+ * `updatedAt` restent exclus. Un objet vide est refusé, de même qu'un objet
+ * ne contenant que des clés explicitement à `undefined` (ex.
+ * `{ description: undefined }`) : `Object.keys(...).length > 0` aurait
+ * accepté ce cas à tort, car une clé Zod présente avec la valeur `undefined`
+ * reste une clé propre de l'objet parsé. `Object.values(...).some(...)`
+ * exige qu'au moins une valeur soit réellement définie (une valeur `null`
+ * explicite compte comme définie et reste donc valide pour effacer un champ
+ * nullable).
  */
 export const updateProjectSchema = z
   .object({
@@ -84,7 +91,7 @@ export const updateProjectSchema = z
   })
   .partial()
   .strict()
-  .refine((data) => Object.keys(data).length > 0, {
+  .refine((data) => Object.values(data).some((value) => value !== undefined), {
     message: 'La mise à jour doit contenir au moins un champ.'
   })
 

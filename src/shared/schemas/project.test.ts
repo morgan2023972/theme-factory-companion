@@ -173,4 +173,25 @@ describe('updateProjectSchema', () => {
   it('accepte de remettre un champ nullable à null', () => {
     expect(updateProjectSchema.safeParse({ description: null }).success).toBe(true)
   })
+
+  it('refuse un objet ne contenant qu\'une clé explicitement à undefined (équivalent à une mise à jour vide)', () => {
+    expect(updateProjectSchema.safeParse({ description: undefined }).success).toBe(false)
+  })
+
+  it('refuse un objet ne contenant que des clés à undefined, même multiples', () => {
+    expect(updateProjectSchema.safeParse({ name: undefined, description: undefined }).success).toBe(false)
+  })
+
+  it('accepte toujours { description: null } (null reste une valeur réellement définie)', () => {
+    expect(updateProjectSchema.safeParse({ description: null }).success).toBe(true)
+  })
+
+  it('accepte un objet mêlant une clé undefined et une clé réellement définie', () => {
+    const result = updateProjectSchema.safeParse({ name: 'Nouveau nom', description: undefined })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.name).toBe('Nouveau nom')
+      expect(result.data.description).toBeUndefined()
+    }
+  })
 })

@@ -324,6 +324,35 @@ describe('projectsRepository.update', () => {
 
     expect(repository.getById(created.id)?.name).toBe('Projet')
   })
+
+  it("ignore une clé explicitement undefined mélangée à une vraie modification, sans effacer la valeur existante", () => {
+    const created = repository.create({ name: 'Projet', objective: 'Objectif initial' })
+
+    // Le cast `as never` simule uniquement une entrée JavaScript runtime
+    // construite par étalement d'un objet partiel (ex. `{ ...changes }` où
+    // `objective` n'a pas été touché) : TypeScript interdirait normalement
+    // de fournir `objective: undefined` ici puisque la clé serait absente
+    // dans un objet correctement typé.
+    const updated = repository.update(created.id, {
+      name: 'Nouveau nom',
+      objective: undefined
+    } as never)
+
+    expect(updated?.name).toBe('Nouveau nom')
+    expect(updated?.objective).toBe('Objectif initial')
+    expect(repository.getById(created.id)?.objective).toBe('Objectif initial')
+  })
+
+  it('refuse un objet ne contenant que des clés à undefined avant toute requête SQL', () => {
+    const created = repository.create({ name: 'Projet', objective: 'Objectif initial' })
+
+    expect(() => repository.update(created.id, { name: undefined, objective: undefined } as never)).toThrow()
+
+    const unchanged = repository.getById(created.id)
+    expect(unchanged?.name).toBe('Projet')
+    expect(unchanged?.objective).toBe('Objectif initial')
+    expect(unchanged?.updatedAt).toBe(created.updatedAt)
+  })
 })
 
 describe('projectsRepository.remove', () => {

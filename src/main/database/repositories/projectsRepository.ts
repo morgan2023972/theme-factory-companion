@@ -148,6 +148,11 @@ export function createProjectsRepository(
    * qui ne permettrait pas de distinguer un champ absent d'un champ fourni
    * à `null`). Les noms de colonnes proviennent exclusivement de
    * `UPDATABLE_COLUMNS_BY_FIELD`, jamais de l'entrée utilisateur.
+   * `data[field] === undefined` est explicitement exclu de la boucle : une
+   * clé fournie à `undefined` (ex. `{ description: undefined }` obtenu par
+   * étalement d'un objet partiellement rempli) ne doit jamais être
+   * confondue avec un `null` explicite, qui seul doit effacer un champ
+   * nullable.
    */
   function update(id: string, input: UpdateProjectInput): Project | null {
     const data = updateProjectSchema.parse(input)
@@ -164,7 +169,7 @@ export function createProjectsRepository(
     for (const [field, column] of Object.entries(UPDATABLE_COLUMNS_BY_FIELD) as Array<
       [keyof UpdateProjectInput, string]
     >) {
-      if (!(field in data)) {
+      if (!(field in data) || data[field] === undefined) {
         continue
       }
 
