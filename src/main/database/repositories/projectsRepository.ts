@@ -1,25 +1,14 @@
 import { randomUUID } from 'node:crypto'
 import type Database from 'better-sqlite3'
-import type { z } from 'zod'
 import {
   createProjectSchema,
   projectSchema,
   updateProjectSchema,
+  type CreateProjectInput,
   type Project,
   type ProjectStatus,
   type UpdateProjectInput
 } from '../../../shared/schemas/project'
-
-/**
- * Le type partagé `CreateProjectInput` (z.infer, donc le type de *sortie*
- * du schéma) rend `status` obligatoire puisque la valeur par défaut
- * ('planning') y est déjà résolue. Pour accepter un appel de création
- * minimal (sans `status`, cas normal couvert par la valeur par défaut du
- * schéma), le paramètre de `create` utilise le type d'*entrée* du schéma
- * (`z.input`), où `status` reste optionnel. La validation passe toujours
- * par `createProjectSchema.parse(...)`.
- */
-type CreateProjectPayload = z.input<typeof createProjectSchema>
 
 /**
  * Forme d'une ligne SQLite de la table `projects` (colonnes en snake_case).
@@ -72,7 +61,7 @@ function mapRowToProject(row: ProjectRow): Project {
 export type ProjectsRepository = {
   readonly list: () => Project[]
   readonly getById: (id: string) => Project | null
-  readonly create: (input: CreateProjectPayload) => Project
+  readonly create: (input: CreateProjectInput) => Project
   readonly update: (id: string, input: UpdateProjectInput) => Project | null
   readonly remove: (id: string) => boolean
 }
@@ -131,7 +120,7 @@ export function createProjectsRepository(
     return row ? mapRowToProject(row) : null
   }
 
-  function create(input: CreateProjectPayload): Project {
+  function create(input: CreateProjectInput): Project {
     const data = createProjectSchema.parse(input)
     const id = randomUUID()
     const timestamp = now()

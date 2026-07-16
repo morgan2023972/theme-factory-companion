@@ -57,7 +57,15 @@ export const createProjectSchema = z
   })
   .strict()
 
-export type CreateProjectInput = z.infer<typeof createProjectSchema>
+/**
+ * Type d'entrée du schéma de création (`z.input`), et non le type de
+ * sortie : `status` possède une valeur par défaut ('planning') résolue par
+ * Zod lors du `parse()`, donc absente/optionnelle côté appelant. Utiliser
+ * `z.infer` (type de sortie) aurait rendu `status` obligatoire pour tout
+ * appelant TypeScript, empêchant un appel de création minimal `{ name }`
+ * pourtant valide au runtime.
+ */
+export type CreateProjectInput = z.input<typeof createProjectSchema>
 
 /**
  * Schéma de mise à jour partielle : mêmes règles de validation que la
