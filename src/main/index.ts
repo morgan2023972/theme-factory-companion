@@ -3,7 +3,9 @@ import { createMainWindow } from './windows/createMainWindow'
 import { closeDatabase, openDatabase } from './database/database'
 import { resolveDatabasePath } from './database/databasePath'
 import { createProjectsRepository } from './database/repositories/projectsRepository'
+import { createPhasesRepository } from './database/repositories/phasesRepository'
 import { registerProjectsHandlers } from './ipc/registerProjectsHandlers'
+import { registerPhasesHandlers } from './ipc/registerPhasesHandlers'
 
 app.whenReady().then(() => {
   let database: ReturnType<typeof openDatabase>
@@ -16,7 +18,9 @@ app.whenReady().then(() => {
   }
 
   const projectsRepository = createProjectsRepository(database)
+  const phasesRepository = createPhasesRepository(database)
   registerProjectsHandlers({ ipcMain, projectsRepository })
+  registerPhasesHandlers({ ipcMain, phasesRepository })
 
   createMainWindow()
 

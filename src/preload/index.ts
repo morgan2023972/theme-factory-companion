@@ -3,6 +3,7 @@ import { createAppInfo } from '../shared/appInfo'
 import { IPC_CHANNELS } from '../shared/contracts/ipcChannels'
 import type { ThemeFactoryApi, ThemeFactoryEnvironment } from '../shared/contracts/themeFactoryApi'
 import type { CreateProjectInput, Project, UpdateProjectInput } from '../shared/schemas/project'
+import type { CreatePhaseInput, Phase, UpdatePhaseInput } from '../shared/schemas/phase'
 
 const ENVIRONMENT_ARG_PREFIX = '--tfc-environment='
 
@@ -24,6 +25,15 @@ const themeFactoryApi: ThemeFactoryApi = {
     update: (id: string, input: UpdateProjectInput) =>
       ipcRenderer.invoke(IPC_CHANNELS.projects.update, { id, input }) as Promise<Project | null>,
     remove: (id: string) => ipcRenderer.invoke(IPC_CHANNELS.projects.remove, id) as Promise<boolean>
+  },
+  phases: {
+    listByProjectId: (projectId: string) =>
+      ipcRenderer.invoke(IPC_CHANNELS.phases.listByProjectId, projectId) as Promise<Phase[]>,
+    getById: (id: string) => ipcRenderer.invoke(IPC_CHANNELS.phases.getById, id) as Promise<Phase | null>,
+    create: (input: CreatePhaseInput) => ipcRenderer.invoke(IPC_CHANNELS.phases.create, input) as Promise<Phase>,
+    update: (id: string, input: UpdatePhaseInput) =>
+      ipcRenderer.invoke(IPC_CHANNELS.phases.update, { id, input }) as Promise<Phase | null>,
+    remove: (id: string) => ipcRenderer.invoke(IPC_CHANNELS.phases.remove, id) as Promise<boolean>
   }
 }
 

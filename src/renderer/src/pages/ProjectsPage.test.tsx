@@ -40,11 +40,20 @@ function installThemeFactoryApi(): void {
     remove: vi.fn()
   }
 
+  const phasesApi: ThemeFactoryApi['phases'] = {
+    listByProjectId: vi.fn(),
+    getById: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    remove: vi.fn()
+  }
+
   const api: ThemeFactoryApi = {
     app: {
       getInfo: () => ({ name: 'Theme Factory Companion', phase: 'Phase 3', environment: 'development' })
     },
-    projects: projectsApi as unknown as ThemeFactoryApi['projects']
+    projects: projectsApi as unknown as ThemeFactoryApi['projects'],
+    phases: phasesApi
   }
 
   Object.defineProperty(window, 'themeFactoryApi', {

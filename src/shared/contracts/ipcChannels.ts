@@ -11,5 +11,12 @@ export const IPC_CHANNELS = {
     create: 'projects:create',
     update: 'projects:update',
     remove: 'projects:remove'
+  },
+  phases: {
+    listByProjectId: 'phases:listByProjectId',
+    getById: 'phases:getById',
+    create: 'phases:create',
+    update: 'phases:update',
+    remove: 'phases:remove'
   }
 } as const
