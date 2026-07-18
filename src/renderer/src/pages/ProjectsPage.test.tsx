@@ -1,10 +1,22 @@
 // @vitest-environment jsdom
+import { useState } from 'react'
 import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ThemeFactoryApi } from '../../../shared/contracts/themeFactoryApi'
 import type { Project } from '../../../shared/schemas/project'
 import { ProjectsPage } from './ProjectsPage'
+
+/**
+ * `ProjectsPage` est contrôlé pour le projet actif depuis la Phase 3.7 (state
+ * levé dans `App.tsx`, partagé avec `PhasesPage`). Ce harnais reproduit
+ * localement ce state parent, pour que les tests existants conservent
+ * exactement le même comportement observable qu'avant ce changement.
+ */
+function ProjectsPageHarness(): React.JSX.Element {
+  const [activeProject, setActiveProject] = useState<Project | null>(null)
+  return <ProjectsPage activeProject={activeProject} onActiveProjectChange={setActiveProject} />
+}
 
 function makeProject(overrides: Partial<Project> = {}): Project {
   return {
@@ -82,7 +94,7 @@ describe('ProjectsPage — chargement', () => {
       })
     )
 
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     expect(screen.getByRole('status')).toHaveTextContent('Chargement')
 
@@ -97,7 +109,7 @@ describe('ProjectsPage — chargement', () => {
   it('affiche un état vide quand aucun projet n\'existe', async () => {
     projectsApi.list.mockResolvedValue([])
 
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     expect(await screen.findByText('Aucun projet enregistré pour le moment.')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Nouveau projet' })).toBeTruthy()
@@ -106,7 +118,7 @@ describe('ProjectsPage — chargement', () => {
   it('affiche une erreur lisible si le chargement échoue, avec un bouton pour réessayer', async () => {
     projectsApi.list.mockRejectedValueOnce(new Error('Panne réseau simulée'))
 
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Panne réseau simulée')
 
@@ -125,7 +137,7 @@ describe('ProjectsPage — création', () => {
     projectsApi.create.mockResolvedValue(created)
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Aucun projet enregistré pour le moment.')
 
@@ -142,7 +154,7 @@ describe('ProjectsPage — création', () => {
     projectsApi.list.mockResolvedValue([])
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Aucun projet enregistré pour le moment.')
 
@@ -159,7 +171,7 @@ describe('ProjectsPage — création', () => {
     projectsApi.create.mockRejectedValueOnce(new Error('Création impossible'))
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Aucun projet enregistré pour le moment.')
 
@@ -183,7 +195,7 @@ describe('ProjectsPage — modification', () => {
     projectsApi.update.mockResolvedValue(updated)
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Projet initial')
     await user.click(screen.getByRole('button', { name: 'Modifier' }))
@@ -205,7 +217,7 @@ describe('ProjectsPage — modification', () => {
     projectsApi.update.mockResolvedValue(null)
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Projet fantôme')
     await user.click(screen.getByRole('button', { name: 'Modifier' }))
@@ -230,7 +242,7 @@ describe('ProjectsPage — modification', () => {
     projectsApi.update.mockResolvedValue({ ...second, name: 'Projet B modifié' })
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Projet A')
     const firstCard = screen.getByText('Projet A').closest('article') as HTMLElement
@@ -281,7 +293,7 @@ describe('ProjectsPage — suppression', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(false)
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Projet de test')
     await user.click(screen.getByRole('button', { name: 'Supprimer' }))
@@ -298,7 +310,7 @@ describe('ProjectsPage — suppression', () => {
     projectsApi.remove.mockResolvedValue(true)
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Projet de test')
     await user.click(screen.getByRole('button', { name: 'Supprimer' }))
@@ -314,7 +326,7 @@ describe('ProjectsPage — suppression', () => {
     projectsApi.remove.mockRejectedValue(new Error('Suppression impossible'))
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Projet de test')
     await user.click(screen.getByRole('button', { name: 'Supprimer' }))
@@ -337,7 +349,7 @@ describe('ProjectsPage — suppression', () => {
     )
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Projet A')
     const firstCard = screen.getByText('Projet A').closest('article') as HTMLElement
@@ -369,7 +381,7 @@ describe('ProjectsPage — sélection du projet actif', () => {
     projectsApi.list.mockResolvedValue([first, second])
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Premier projet')
 
@@ -395,7 +407,7 @@ describe('ProjectsPage — sélection du projet actif', () => {
     projectsApi.remove.mockResolvedValue(true)
 
     const user = userEvent.setup()
-    render(<ProjectsPage />)
+    render(<ProjectsPageHarness />)
 
     await screen.findByText('Premier projet')
     const firstCard = screen.getByText('Premier projet').closest('article') as HTMLElement

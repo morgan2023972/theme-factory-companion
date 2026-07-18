@@ -175,21 +175,25 @@ button {
 
 /* Projects */
 
-.projects-page {
+.projects-page,
+.phases-page {
   max-width: 920px;
 }
 
-.projects-page__toolbar {
+.projects-page__toolbar,
+.phases-page__toolbar {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 1rem;
 }
 
-.projects-page__empty {
+.projects-page__empty,
+.phases-page__empty {
   color: var(--color-text-muted);
 }
 
-.projects-page__error {
+.projects-page__error,
+.phases-page__error {
   background: #fdecea;
   border: 1px solid #f3b4ac;
   color: #7a1f14;
@@ -198,7 +202,8 @@ button {
   margin: 0 0 1rem;
 }
 
-.projects-page__list {
+.projects-page__list,
+.phases-page__list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -207,7 +212,14 @@ button {
   gap: 1rem;
 }
 
-.project-card {
+.phases-page__active-project,
+.phases-page__no-active-project {
+  color: var(--color-text-muted);
+  margin: 0 0 1rem;
+}
+
+.project-card,
+.phase-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -222,19 +234,22 @@ button {
   box-shadow: 0 0 0 1px var(--color-sidebar-accent);
 }
 
-.project-card__name {
+.project-card__name,
+.phase-card__name {
   margin: 0;
   font-size: 1.05rem;
 }
 
-.project-card__status {
+.project-card__status,
+.phase-card__status {
   margin: 0;
   font-weight: 600;
   color: var(--color-text-muted);
 }
 
 .project-card__description,
-.project-card__meta {
+.project-card__meta,
+.phase-card__description {
   margin: 0;
   font-size: 0.9rem;
 }
@@ -245,13 +260,15 @@ button {
   color: var(--color-text-muted);
 }
 
-.project-card__actions {
+.project-card__actions,
+.phase-card__actions {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
 
-.project-card__actions button {
+.project-card__actions button,
+.phase-card__actions button {
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   border-radius: 4px;
@@ -259,7 +276,8 @@ button {
   cursor: pointer;
 }
 
-.project-card__actions button:disabled {
+.project-card__actions button:disabled,
+.phase-card__actions button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -270,7 +288,8 @@ button {
   color: #ffffff;
 }
 
-.project-form {
+.project-form,
+.phase-form {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -282,18 +301,21 @@ button {
   gap: 0.85rem;
 }
 
-.project-form__title {
+.project-form__title,
+.phase-form__title {
   margin: 0;
   font-size: 1.1rem;
 }
 
-.project-form__field {
+.project-form__field,
+.phase-form__field {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
 
-.project-form__field label {
+.project-form__field label,
+.phase-form__field label {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text-muted);
@@ -301,7 +323,10 @@ button {
 
 .project-form__field input,
 .project-form__field select,
-.project-form__field textarea {
+.project-form__field textarea,
+.phase-form__field input,
+.phase-form__field select,
+.phase-form__field textarea {
   font: inherit;
   padding: 0.4rem 0.5rem;
   border: 1px solid var(--color-border);
@@ -312,23 +337,30 @@ button {
 
 .project-form__field input:disabled,
 .project-form__field select:disabled,
-.project-form__field textarea:disabled {
+.project-form__field textarea:disabled,
+.phase-form__field input:disabled,
+.phase-form__field select:disabled,
+.phase-form__field textarea:disabled {
   opacity: 0.6;
 }
 
 .project-form__field-error,
-.project-form__error {
+.project-form__error,
+.phase-form__field-error,
+.phase-form__error {
   margin: 0;
   color: #b3261e;
   font-size: 0.85rem;
 }
 
-.project-form__actions {
+.project-form__actions,
+.phase-form__actions {
   display: flex;
   gap: 0.5rem;
 }
 
-.project-form__actions button {
+.project-form__actions button,
+.phase-form__actions button {
   border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 0.45rem 0.9rem;
@@ -336,13 +368,15 @@ button {
   background: var(--color-surface);
 }
 
-.project-form__actions button[type='submit'] {
+.project-form__actions button[type='submit'],
+.phase-form__actions button[type='submit'] {
   background: var(--color-sidebar-accent);
   border-color: var(--color-sidebar-accent);
   color: #ffffff;
 }
 
-.project-form__actions button:disabled {
+.project-form__actions button:disabled,
+.phase-form__actions button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

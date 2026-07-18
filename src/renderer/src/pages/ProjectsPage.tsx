@@ -8,10 +8,15 @@ type LoadState = { status: 'loading' } | { status: 'error'; message: string } | 
 
 type FormState = { mode: 'closed' } | { mode: 'create' } | { mode: 'edit'; project: Project }
 
-export function ProjectsPage(): React.JSX.Element {
+interface ProjectsPageProps {
+  /** Projet actif partagé avec la page Phases (voir App.tsx) : source de vérité unique, non dupliquée ici. */
+  activeProject: Project | null
+  onActiveProjectChange: (project: Project | null) => void
+}
+
+export function ProjectsPage({ activeProject, onActiveProjectChange }: ProjectsPageProps): React.JSX.Element {
   const [projects, setProjects] = useState<Project[]>([])
   const [loadState, setLoadState] = useState<LoadState>({ status: 'loading' })
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null)
   const [formState, setFormState] = useState<FormState>({ mode: 'closed' })
   const [isSubmittingForm, setIsSubmittingForm] = useState(false)
   const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null)
@@ -26,6 +31,12 @@ export function ProjectsPage(): React.JSX.Element {
     }
   }, [])
 
+  // Lu depuis `loadProjects` (callback stable) pour reconnaître le projet
+  // actif courant sans le lister dans ses dépendances, ce qui éviterait un
+  // rechargement complet de la liste à chaque changement de sélection.
+  const activeProjectRef = useRef(activeProject)
+  activeProjectRef.current = activeProject
+
   const loadProjects = useCallback(async () => {
     setLoadState({ status: 'loading' })
     try {
@@ -35,16 +46,17 @@ export function ProjectsPage(): React.JSX.Element {
       }
       setProjects(result)
       setLoadState({ status: 'loaded' })
-      setActiveProjectId((current) =>
-        current && result.some((project) => project.id === current) ? current : null
-      )
+      const current = activeProjectRef.current
+      if (current && !result.some((project) => project.id === current.id)) {
+        onActiveProjectChange(null)
+      }
     } catch (error) {
       if (!isMountedRef.current) {
         return
       }
       setLoadState({ status: 'error', message: getErrorMessage(error) })
     }
-  }, [])
+  }, [onActiveProjectChange])
 
   useEffect(() => {
     void loadProjects()
@@ -94,6 +106,9 @@ export function ProjectsPage(): React.JSX.Element {
           }
           if (updated) {
             setProjects((current) => current.map((project) => (project.id === updated.id ? updated : project)))
+            if (activeProjectRef.current?.id === updated.id) {
+              onActiveProjectChange(updated)
+            }
             setFormState({ mode: 'closed' })
           } else {
             setFormErrorMessage("Ce projet n'existe plus : il a peut-être été supprimé entre-temps.")
@@ -136,7 +151,9 @@ export function ProjectsPage(): React.JSX.Element {
           return
         }
         setProjects((current) => current.filter((item) => item.id !== project.id))
-        setActiveProjectId((current) => (current === project.id ? null : current))
+        if (activeProjectRef.current?.id === project.id) {
+          onActiveProjectChange(null)
+        }
       } catch (error) {
         if (!isMountedRef.current) {
           return
@@ -204,11 +221,11 @@ export function ProjectsPage(): React.JSX.Element {
             <li key={project.id}>
               <ProjectCard
                 project={project}
-                isActive={project.id === activeProjectId}
+                isActive={project.id === activeProject?.id}
                 isDeleting={deletingProjectId === project.id}
                 disableModify={formState.mode !== 'closed'}
                 disableDelete={formState.mode !== 'closed' || deletingProjectId !== null}
-                onSelect={() => setActiveProjectId(project.id)}
+                onSelect={() => onActiveProjectChange(project)}
                 onEdit={() => handleOpenEditForm(project)}
                 onDelete={() => handleDelete(project)}
               />
