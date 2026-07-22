@@ -39,7 +39,7 @@ export type WorkflowRunStatus = z.infer<typeof workflowRunStatusSchema>
  * seulement l'invariant de données qui doit être vrai une fois qu'on y est) :
  * la machine à états proprement dite reste hors périmètre (ORCH-1.2).
  */
-const WORKFLOW_RUN_TERMINAL_STATUSES: readonly WorkflowRunStatus[] = ['completed', 'cancelled', 'failed']
+export const WORKFLOW_RUN_TERMINAL_STATUSES: readonly WorkflowRunStatus[] = ['completed', 'cancelled', 'failed']
 
 /**
  * Une exécution de workflow pour un projet et une phase donnés (voir

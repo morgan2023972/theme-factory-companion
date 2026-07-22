@@ -42,6 +42,7 @@ export {
 
 export {
   WORKFLOW_RUN_STATUSES,
+  WORKFLOW_RUN_TERMINAL_STATUSES,
   workflowRunSchema,
   workflowRunStatusSchema,
   type WorkflowRun,
@@ -58,3 +59,9 @@ export {
   type WorkflowStepStatus,
   type WorkflowStepType
 } from './workflowStep'
+
+export {
+  WORKFLOW_RUN_TRANSITIONS,
+  getAllowedNextWorkflowRunStatuses,
+  isValidWorkflowRunTransition
+} from './workflowStateMachine'
