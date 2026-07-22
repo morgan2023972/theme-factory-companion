@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "profileKey": "electron-typescript",
+  "name": "Electron / TypeScript",
+  "version": "1.0.0",
+  "validationCommands": [
+    {
+      "key": "typecheck",
+      "name": "Typecheck",
+      "command": "npm",
+      "args": ["run", "typecheck"],
+      "blocking": true,
+      "timeoutMs": 120000
+    },
+    {
+      "key": "test",
+      "name": "Tests",
+      "command": "npm",
+      "args": ["run", "test"],
+      "blocking": true,
+      "timeoutMs": 300000
+    },
+    {
+      "key": "build",
+      "name": "Build",
+      "command": "npm",
+      "args": ["run", "build"],
+      "blocking": true,
+      "timeoutMs": 300000
+    },
+    {
+      "key": "git-diff-check",
+      "name": "git diff --check",
+      "command": "git",
+      "args": ["diff", "--check"],
+      "blocking": true,
+      "timeoutMs": 30000
+    },
+    {
+      "key": "git-status-short",
+      "name": "git status --short",
+      "command": "git",
+      "args": ["status", "--short"],
+      "blocking": true,
+      "timeoutMs": 15000
+    }
+  ],
+  "artifactPaths": {
+    "promptsDirectory": "workflow/prompts",
+    "reportsDirectory": "workflow/reports"
+  },
+  "manualValidationChecklist": [
+    "L'application Electron démarre sans erreur visible dans la console.",
+    "Le comportement demandé par la sous-phase fonctionne réellement dans l'application.",
+    "Aucune régression visible n'est constatée sur les écrans existants."
+  ]
+}
