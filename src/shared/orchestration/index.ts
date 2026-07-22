@@ -81,3 +81,12 @@ export {
   getAllowedNextWorkflowRunStatuses,
   isValidWorkflowRunTransition
 } from './workflowStateMachine'
+
+export {
+  workflowArtifactPathsConfigSchema,
+  workflowProfileCommandConfigSchema,
+  workflowProfileConfigSchema,
+  type WorkflowArtifactPathsConfig,
+  type WorkflowProfileCommandConfig,
+  type WorkflowProfileConfig
+} from './workflowProfileConfig'
