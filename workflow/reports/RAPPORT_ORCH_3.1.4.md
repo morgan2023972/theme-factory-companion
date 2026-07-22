@@ -123,7 +123,17 @@ Vérifications post-staging (`git diff --cached --check`, `git diff --cached --s
 
 Commit créé avec le message exact défini dans le prompt (`feat: add Electron TypeScript workflow profile`), sans amend, sans modification d'historique.
 
-*(Le hash court du commit, le résultat de `git log -1 --oneline`, le résultat de `git show --stat --oneline HEAD` et le `git status --short` post-commit sont consignés ci-dessous, capturés après l'exécution effective du commit.)*
+Résultat après commit :
+
+- **Hash court** : `2ee0136`
+- **Message** : `feat: add Electron TypeScript workflow profile`
+- **Fichiers inclus** (4, tous en `create mode`) :
+  - `src/main/orchestration/projectWorkflowProfile.test.ts`
+  - `workflow/config/project.workflow.json`
+  - `workflow/prompts/ORCH_3.1.4_PROMPT.md`
+  - `workflow/reports/RAPPORT_ORCH_3.1.4.md`
+- **`git status --short` après commit** : vide (arbre de travail propre, rien à committer).
+- **Confirmation explicite** : aucun `git push` n'a été exécuté après ce commit.
 
 ## 9. Confirmation
 
