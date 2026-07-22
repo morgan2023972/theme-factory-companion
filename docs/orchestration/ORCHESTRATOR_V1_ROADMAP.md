@@ -27,7 +27,7 @@ Cette roadmap conserve le périmètre fonctionnel initial de l’orchestrateur l
 Pour chaque sous-phase :
 
 1. cadrage technique préalable dans la conversation ;
-2. rédaction d’un prompt Claude Code précis ;
+2. rédaction d’un prompt Claude Code précis (voir « Format exigé pour les prompts de sous-phase » ci-dessous) ;
 3. implémentation limitée ;
 4. tests ciblés et typecheck ;
 5. auto-review Claude Code ;
@@ -36,7 +36,8 @@ Pour chaque sous-phase :
 8. review ici ;
 9. corrections séparées uniquement si nécessaires ;
 10. validation finale du bloc ;
-11. commit et push.
+11. **commit local automatique par Claude Code**, uniquement si toutes les conditions d’autorisation ci-dessous sont réunies ;
+12. **push strictement manuel**, exécuté uniquement par l’utilisateur, jamais par Claude Code.
 
 Claude Code doit s’arrêter et demander une décision humaine lorsqu’il rencontre :
 
@@ -49,7 +50,8 @@ Claude Code doit s’arrêter et demander une décision humaine lorsqu’il renc
 - une règle métier ambiguë ;
 - une action destructive ;
 - un problème de sécurité ;
-- une action Git sensible non autorisée.
+- une action Git sensible non autorisée ;
+- une anomalie quelconque détectée pendant la procédure de commit local automatique décrite ci-dessous.
 
 Pour une petite sous-phase, les validations minimales sont :
 
@@ -68,6 +70,159 @@ npm run build
 git diff --check
 git status --short --untracked-files=all
 ```
+
+### Commit local automatique après une sous-phase réussie
+
+Depuis ORCH-WORKFLOW-AUTOCOMMIT, Claude Code est autorisé à créer le **commit local** d’une sous-phase de façon automatique, sans validation humaine intermédiaire pour cette seule action. Le **push reste strictement manuel** en toutes circonstances (voir plus bas) : cette règle ne modifie en rien les règles de sécurité de l'orchestrateur lui-même (`ORCHESTRATOR_V1_SAFETY_RULES.md`, sections 15 à 18), qui continuent de s'appliquer telles quelles au futur moteur applicatif ; elle ne concerne que le processus de développement de l'orchestrateur mené dans ce dépôt.
+
+#### Conditions d’autorisation du commit local automatique
+
+Le commit local automatique n’est autorisé que si **toutes** les conditions suivantes sont réunies :
+
+1. l’auto-review Claude Code est explicitement réussie ;
+2. aucun défaut non résolu n’est présent ;
+3. aucune correction supplémentaire n’est nécessaire ;
+4. toutes les validations ciblées exigées par la sous-phase sont vertes ;
+5. `git diff --check` réussit ;
+6. la liste exacte des fichiers de la sous-phase est connue ;
+7. tous les fichiers modifiés appartiennent au périmètre autorisé ;
+8. aucun fichier sensible n’est détecté (voir `ORCHESTRATOR_V1_SAFETY_RULES.md`, section 13) ;
+9. aucune modification préexistante non liée n’est présente ;
+10. aucun conflit, merge, rebase ou état Git ambigu n’est en cours ;
+11. le rapport de sous-phase a été créé ;
+12. le message de commit est défini dans le prompt de la sous-phase ;
+13. aucune décision humaine n’est en attente.
+
+Si une seule de ces conditions n’est pas réunie, Claude Code s’arrête sans ajouter ni committer, et rend compte du blocage plutôt que de committer un état partiel.
+
+#### Procédure Git obligatoire avant commit
+
+Claude Code doit exécuter, dans cet ordre :
+
+```powershell
+git status --short
+git diff --check
+git diff --stat
+git diff
+```
+
+puis comparer la liste réelle des fichiers modifiés avec la liste des « Fichiers autorisés pour le commit » définie dans le prompt de la sous-phase.
+
+#### Conditions d’arrêt avant staging
+
+Claude Code doit arrêter immédiatement, sans ajouter ni committer, si :
+
+- un fichier hors périmètre apparaît ;
+- un fichier sensible apparaît ;
+- un fichier `.env`, certificat, clé ou secret apparaît ;
+- `git diff --check` échoue ;
+- une validation échoue ;
+- l’auto-review n’est pas entièrement réussie ;
+- une correction reste nécessaire ;
+- une modification antérieure non liée est présente ;
+- la liste exacte des fichiers à committer est ambiguë ;
+- le dépôt est en état de merge, rebase, cherry-pick ou conflit ;
+- la branche ou HEAD a changé de manière inattendue ;
+- le rapport final ne correspond pas au diff réel.
+
+#### Règles de staging
+
+Si toutes les conditions précédentes sont satisfaites :
+
+- ajouter uniquement les fichiers explicitement autorisés et réellement modifiés ;
+- utiliser une liste exacte de chemins (`git add <chemin1> <chemin2> ...`) ;
+- ne jamais utiliser `git add .` ;
+- ne jamais utiliser `git add -A` ;
+- ne jamais utiliser `git commit -a` ;
+- ne jamais ajouter un fichier non mentionné dans le prompt de sous-phase.
+
+Après staging, exécuter :
+
+```powershell
+git diff --cached --check
+git diff --cached --stat
+git status --short
+```
+
+puis vérifier que :
+
+- tous les fichiers indexés appartiennent à la sous-phase ;
+- aucun autre fichier n’est indexé ;
+- aucun fichier attendu n’a été oublié ;
+- le diff indexé est cohérent avec le rapport de sous-phase.
+
+#### Exécution du commit local automatique
+
+Si et seulement si toutes les vérifications précédentes sont réussies :
+
+- créer le commit avec le message exact défini dans le prompt de la sous-phase (ne jamais improviser un autre message) ;
+- ne jamais amender un commit existant (`git commit --amend` interdit) ;
+- ne jamais modifier l’historique ;
+- ne jamais pousser.
+
+Après le commit, exécuter :
+
+```powershell
+git status --short
+git log -1 --oneline
+git show --stat --oneline HEAD
+```
+
+Le rapport de sous-phase doit indiquer :
+
+- le hash court du commit ;
+- le message du commit ;
+- les fichiers inclus ;
+- le résultat de `git status` après commit ;
+- la confirmation explicite qu’aucun push n’a été exécuté.
+
+#### Push strictement interdit à Claude Code
+
+Claude Code ne doit jamais exécuter :
+
+```text
+git push
+git push --force
+git push --force-with-lease
+```
+
+Le push reste toujours manuel et séparé, effectué uniquement par l’utilisateur après vérification du commit local — sans exception, y compris lorsque le commit automatique a réussi.
+
+#### Commandes Git interdites dans ce workflow
+
+Sont explicitement interdites à Claude Code dans le cadre de ce workflow, en plus des commandes déjà listées comme interdites par `ORCHESTRATOR_V1_SAFETY_RULES.md` (section 8) :
+
+```text
+git add .
+git add -A
+git commit -a
+git commit --amend
+git reset --hard
+git clean -fd
+git push
+git push --force
+git push --force-with-lease
+```
+
+### Format exigé pour les prompts de sous-phase
+
+Depuis ORCH-WORKFLOW-AUTOCOMMIT, chaque prompt de sous-phase (`workflow/prompts/ORCH_X.Y.Z_PROMPT.md`) doit contenir une section explicite au format suivant :
+
+```text
+Fichiers autorisés pour le commit :
+- liste exacte des chemins
+
+Message de commit :
+- message exact
+
+Commit local automatique :
+- autorisé uniquement si auto-review réussie et validations vertes
+
+Push :
+- strictement interdit
+```
+
+Le prompt doit également préciser explicitement que toute anomalie détectée (défaut non résolu, fichier hors périmètre, validation en échec, ambiguïté quelconque) entraîne un arrêt humain, sans commit.
 
 ---
 
