@@ -107,3 +107,45 @@ export const commandExecutionSchema = z
   })
 
 export type CommandExecution = z.infer<typeof commandExecutionSchema>
+
+/**
+ * Données acceptées pour la création d'une exécution de commande (ORCH-2.2).
+ * `status` (toujours `'pending'`), `exitCode`/`startedAt`/`completedAt`/
+ * `durationMs` (toujours `null`), `stdout`/`stderr` (toujours `''`) et
+ * `stdoutTruncated`/`stderrTruncated` (toujours `false`) ne sont pas des
+ * champs de création : ils sont fixés par le repository.
+ */
+export const createCommandExecutionSchema = z
+  .object({
+    workflowRunId: z.uuid(),
+    workflowStepId: z.uuid().nullable(),
+    executable: nonEmptyTrimmedText("L'exécutable de la commande est obligatoire."),
+    args: z.array(z.string()),
+    cwd: nonEmptyTrimmedText('Le répertoire de travail (cwd) est obligatoire.')
+  })
+  .strict()
+
+export type CreateCommandExecutionInput = z.infer<typeof createCommandExecutionSchema>
+
+/**
+ * Données acceptées pour compléter une exécution en cours (ORCH-2.2).
+ * Schéma de complétion étroit, appelé uniquement par
+ * `commandExecutionsRepository.complete` (transition depuis `'running'`
+ * uniquement) ; `completedAt` est généré par le repository. Ce schéma ne
+ * duplique pas l'invariant composite de `commandExecutionSchema`
+ * (`superRefine`) : la relecture de la ligne finale via ce dernier, après
+ * écriture, reste l'unique source de vérité pour cette cohérence.
+ */
+export const completeCommandExecutionSchema = z
+  .object({
+    status: z.enum(['completed', 'failed', 'timed_out', 'cancelled']),
+    exitCode: z.number().int().nullable(),
+    durationMs: nonNegativeInt('La durée doit être un entier positif ou nul.'),
+    stdout: z.string(),
+    stderr: z.string(),
+    stdoutTruncated: z.boolean(),
+    stderrTruncated: z.boolean()
+  })
+  .strict()
+
+export type CompleteCommandExecutionInput = z.infer<typeof completeCommandExecutionSchema>

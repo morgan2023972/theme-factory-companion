@@ -104,3 +104,20 @@ export const workflowStepSchema = z
   })
 
 export type WorkflowStep = z.infer<typeof workflowStepSchema>
+
+/**
+ * Données acceptées pour la création d'une étape (ORCH-2.2). `status`
+ * (toujours `'pending'`) et `startedAt`/`completedAt` (toujours `null`) ne
+ * sont pas des champs de création : ils sont fixés par le repository.
+ * `position` reste un champ de création explicite, fourni par l'appelant
+ * (aucun calcul automatique de position n'est ajouté pour cette entité).
+ */
+export const createWorkflowStepSchema = z
+  .object({
+    workflowRunId: z.uuid(),
+    type: workflowStepTypeSchema,
+    position: nonNegativeInt('La position doit être un entier positif ou nul.')
+  })
+  .strict()
+
+export type CreateWorkflowStepInput = z.infer<typeof createWorkflowStepSchema>

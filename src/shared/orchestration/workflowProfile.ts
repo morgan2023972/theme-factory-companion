@@ -56,3 +56,20 @@ export const workflowProfileSchema = z
   .strict()
 
 export type WorkflowProfile = z.infer<typeof workflowProfileSchema>
+
+/**
+ * Données acceptées pour la création d'un profil de workflow (ORCH-2.2).
+ * `id`, `createdAt` et `updatedAt` sont générés par le repository.
+ * `validationCommands` reprend `validationCommandSchema` tel quel : l'ordre
+ * du tableau fourni définit l'ordre persisté (`position` SQL, un ordinal
+ * qui n'existe pas côté `ValidationCommand`).
+ */
+export const createWorkflowProfileSchema = z
+  .object({
+    name: nonEmptyTrimmedText('Le nom du profil est obligatoire.'),
+    version: nonEmptyTrimmedText('La version du profil est obligatoire.'),
+    validationCommands: z.array(validationCommandSchema)
+  })
+  .strict()
+
+export type CreateWorkflowProfileInput = z.infer<typeof createWorkflowProfileSchema>

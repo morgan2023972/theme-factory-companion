@@ -47,3 +47,20 @@ export const workflowArtifactSchema = z
   .strict()
 
 export type WorkflowArtifact = z.infer<typeof workflowArtifactSchema>
+
+/**
+ * Données acceptées pour la création d'un artefact (ORCH-2.2). `createdAt`
+ * n'est pas un champ de création : il est généré par le repository. Aucun
+ * champ de mise à jour n'existe pour cette entité : un artefact est
+ * immuable après création (voir `workflowArtifactSchema` ci-dessus).
+ */
+export const createWorkflowArtifactSchema = z
+  .object({
+    workflowRunId: z.uuid(),
+    workflowStepId: z.uuid().nullable(),
+    type: workflowArtifactTypeSchema,
+    relativePath: relativeArtifactPathSchema
+  })
+  .strict()
+
+export type CreateWorkflowArtifactInput = z.infer<typeof createWorkflowArtifactSchema>

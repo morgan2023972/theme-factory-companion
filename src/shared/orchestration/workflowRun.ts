@@ -97,3 +97,25 @@ export const workflowRunSchema = z
   })
 
 export type WorkflowRun = z.infer<typeof workflowRunSchema>
+
+/**
+ * Données acceptées pour la création d'un workflow (ORCH-2.2). `status`
+ * (toujours `'draft'`), `currentStepId` (toujours `null`) et `completedAt`
+ * (toujours `null`) ne sont pas des champs de création : ils sont fixés par
+ * le repository. `startedAt` n'est pas non plus un champ de création : sa
+ * valeur est générée par le repository via son horloge injectée, la
+ * création d'un `WorkflowRun` correspondant exactement à l'Étape 1 du
+ * workflow (« initialisation du contexte de travail ») — il n'existe pas de
+ * distinction entre l'instant de création et l'instant de démarrage pour
+ * cette entité.
+ */
+export const createWorkflowRunSchema = z
+  .object({
+    projectId: z.uuid(),
+    phaseId: z.uuid(),
+    profileId: z.uuid(),
+    profileFingerprint: nonEmptyTrimmedText("L'empreinte du profil actif est obligatoire.")
+  })
+  .strict()
+
+export type CreateWorkflowRunInput = z.infer<typeof createWorkflowRunSchema>

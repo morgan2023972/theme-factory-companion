@@ -10,14 +10,20 @@ export {
   COMMAND_EXECUTION_STATUSES,
   commandExecutionSchema,
   commandExecutionStatusSchema,
+  completeCommandExecutionSchema,
+  createCommandExecutionSchema,
   type CommandExecution,
-  type CommandExecutionStatus
+  type CommandExecutionStatus,
+  type CompleteCommandExecutionInput,
+  type CreateCommandExecutionInput
 } from './commandExecution'
 
 export {
   WORKFLOW_ARTIFACT_TYPES,
+  createWorkflowArtifactSchema,
   workflowArtifactSchema,
   workflowArtifactTypeSchema,
+  type CreateWorkflowArtifactInput,
   type WorkflowArtifact,
   type WorkflowArtifactType
 } from './workflowArtifact'
@@ -25,17 +31,23 @@ export {
 export {
   WORKFLOW_APPROVAL_STATUSES,
   WORKFLOW_APPROVAL_TYPES,
+  createWorkflowApprovalSchema,
+  decideWorkflowApprovalSchema,
   workflowApprovalSchema,
   workflowApprovalStatusSchema,
   workflowApprovalTypeSchema,
+  type CreateWorkflowApprovalInput,
+  type DecideWorkflowApprovalInput,
   type WorkflowApproval,
   type WorkflowApprovalStatus,
   type WorkflowApprovalType
 } from './workflowApproval'
 
 export {
+  createWorkflowProfileSchema,
   validationCommandSchema,
   workflowProfileSchema,
+  type CreateWorkflowProfileInput,
   type ValidationCommand,
   type WorkflowProfile
 } from './workflowProfile'
@@ -43,8 +55,10 @@ export {
 export {
   WORKFLOW_RUN_STATUSES,
   WORKFLOW_RUN_TERMINAL_STATUSES,
+  createWorkflowRunSchema,
   workflowRunSchema,
   workflowRunStatusSchema,
+  type CreateWorkflowRunInput,
   type WorkflowRun,
   type WorkflowRunStatus
 } from './workflowRun'
@@ -52,9 +66,11 @@ export {
 export {
   WORKFLOW_STEP_STATUSES,
   WORKFLOW_STEP_TYPES,
+  createWorkflowStepSchema,
   workflowStepSchema,
   workflowStepStatusSchema,
   workflowStepTypeSchema,
+  type CreateWorkflowStepInput,
   type WorkflowStep,
   type WorkflowStepStatus,
   type WorkflowStepType

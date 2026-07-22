@@ -63,3 +63,35 @@ export const workflowApprovalSchema = z
   })
 
 export type WorkflowApproval = z.infer<typeof workflowApprovalSchema>
+
+/**
+ * Données acceptées pour la création d'une approbation (ORCH-2.2). `status`
+ * (toujours `'pending'`) et `decidedAt` (toujours `null`) ne sont pas des
+ * champs de création. `requestedAt` non plus : sa valeur est générée par le
+ * repository via son horloge injectée, la création d'une `WorkflowApproval`
+ * correspondant exactement à l'instant de sa demande (même raisonnement que
+ * `WorkflowRun.startedAt`).
+ */
+export const createWorkflowApprovalSchema = z
+  .object({
+    workflowRunId: z.uuid(),
+    workflowStepId: z.uuid().nullable(),
+    type: workflowApprovalTypeSchema
+  })
+  .strict()
+
+export type CreateWorkflowApprovalInput = z.infer<typeof createWorkflowApprovalSchema>
+
+/**
+ * Données acceptées pour décider d'une approbation en attente (ORCH-2.2).
+ * Schéma de décision étroit, distinct d'un `updateXSchema` générique : une
+ * approbation ne peut être décidée qu'une seule fois (section 18 des règles
+ * de sécurité), `decidedAt` est généré par le repository.
+ */
+export const decideWorkflowApprovalSchema = z
+  .object({
+    status: z.enum(['approved', 'rejected'])
+  })
+  .strict()
+
+export type DecideWorkflowApprovalInput = z.infer<typeof decideWorkflowApprovalSchema>
