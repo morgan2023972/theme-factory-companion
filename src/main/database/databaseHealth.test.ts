@@ -93,8 +93,8 @@ describe('checkDatabaseHealth — cas de succès (base réelle migrée)', () => 
     const report = checkDatabaseHealth(db)
 
     expect(report.currentMigrationVersion).toBe(report.expectedMigrationVersion)
-    expect(report.currentMigrationVersion).toBe(1)
-    expect(report.appliedMigrationCount).toBe(1)
+    expect(report.currentMigrationVersion).toBe(2)
+    expect(report.appliedMigrationCount).toBe(2)
     db.close()
   })
 })
