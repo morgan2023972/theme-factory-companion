@@ -90,4 +90,29 @@ describe('project.workflow.json (profil réel du projet)', () => {
 
     expect(computeWorkflowProfileFingerprint(firstLoad)).toBe(computeWorkflowProfileFingerprint(secondLoad))
   })
+
+  it('produit une empreinte différente pour une modification en mémoire du profil réel (jamais écrite sur disque)', () => {
+    const profile = loadWorkflowProfile(PROJECT_WORKFLOW_PROFILE_PATH)
+
+    const mutatedProfile = {
+      ...profile,
+      validationCommands: [
+        { ...profile.validationCommands[0], blocking: !profile.validationCommands[0].blocking },
+        ...profile.validationCommands.slice(1)
+      ]
+    }
+
+    expect(computeWorkflowProfileFingerprint(mutatedProfile)).not.toBe(computeWorkflowProfileFingerprint(profile))
+  })
+
+  it('produit une empreinte différente si validationCommands est réordonné', () => {
+    const profile = loadWorkflowProfile(PROJECT_WORKFLOW_PROFILE_PATH)
+
+    const reorderedProfile = {
+      ...profile,
+      validationCommands: [...profile.validationCommands].reverse()
+    }
+
+    expect(computeWorkflowProfileFingerprint(reorderedProfile)).not.toBe(computeWorkflowProfileFingerprint(profile))
+  })
 })
